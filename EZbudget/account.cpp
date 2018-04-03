@@ -1,7 +1,7 @@
 /*
  * Account implementation file
  * Author: Jose Quirarte
- * Date 2/24/18
+ * Date Feb 24, 2018
  *
  * */
 #include "account.h"
