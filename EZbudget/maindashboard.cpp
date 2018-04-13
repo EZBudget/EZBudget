@@ -7,6 +7,7 @@
 #include <QTableWidget>
 #include "databasereaderwriter.h"
 #include "account.h"
+#include "transaction.h"
 using namespace std;
 
 #include <QtWidgets/QApplication>
@@ -30,6 +31,7 @@ mainDashboard::mainDashboard(QWidget *parent) :
     ui(new Ui::mainDashboard)
 {
     ui->setupUi(this);
+    this->setWindowTitle("My Dashboard");
     {
         //bar chart: spendings vs budget left
         spendingsBarSet = new QBarSet("Spendings");
@@ -85,11 +87,17 @@ mainDashboard::mainDashboard(QWidget *parent) :
         QStringList categories = {
             "Bills", "Gas", "Food", "Entertainment"
         };
-
-//        for(int i = 0; i < categories.size(); i++)
-//        {
-//            spendSeries->append(new spendingsBreakdownSlice(QRandomGenerator::global()->bounded(1000), categories.at(i), catSeries));
-//        }
+        /*
+        QStringList categories = pCurrentAcount->getSpendingCategories();
+        for(QString category : categories)
+        {
+            // You now have a category name
+            QList<Transaction> transactions = pCurrentAcount->getSpendingTransactions(category);
+            // You now have all the transactions for that specific category
+            // You need to have a loop here that goes through the transactions and does something
+            // ...
+        }
+        */
 
         for (const QString &category : categories) {
             catSeries = new QPieSeries();
@@ -114,6 +122,9 @@ mainDashboard::mainDashboard(QWidget *parent) :
         spendBreakdownChartView->showNormal();
 
     }
+    DatabaseReaderWriter* db = DatabaseReaderWriter::Instance();
+    Account* pCurrentAcount = db -> getAccountInstance();
+    QObject::connect(pCurrentAcount, SIGNAL(accountModified()),this, SLOT(updateUi()));
 }
 
 mainDashboard::~mainDashboard()
@@ -121,25 +132,35 @@ mainDashboard::~mainDashboard()
     delete ui;
 }
 
-void mainDashboard::updateUi(Account* ref)
+void mainDashboard::updateUi()
 {
     // lets get the account
-    Account *pCurrentAcount = ref;//new Account();
+    DatabaseReaderWriter* db = DatabaseReaderWriter::Instance();
+    Account* pCurrentAcount = db -> getAccountInstance();
+    //Account *pCurrentAcount = ref;//new Account();
 
-    QString updatedBudgetLeft = QString::number(pCurrentAcount->calculateBudgetLeft());
-    ui->budgetLabelUpdate->clear();
-    updatedBudgetLeft += "$";
-    ui->budgetLabelUpdate->setText(updatedBudgetLeft);
+    string Expenses = "Expenses";
+    QString qExpenses = QString::fromStdString(Expenses);
 
-    spendingsBarSet->replace(0, pCurrentAcount->getTotalSpendingsFromAllCategories());
-    budgetLeftBarSet->replace(0, pCurrentAcount->calculateBudgetLeft());
+    QString updatedBudgetLeft = "$" + QString::number(pCurrentAcount->calculateBudgetLeft(qExpenses));
+    ui->updateBudgetLeftLabel->setText(updatedBudgetLeft);
 
-    QString spendingLabel = spendingsBarSet->label();
-    QString budgetLeftLabel = budgetLeftBarSet->label();
-    spendingLabel += ", $";
-    budgetLeftLabel += ", $";
-    spendingLabel += QString::number(pCurrentAcount->getTotalSpendingsFromAllCategories());
-    budgetLeftLabel += QString::number(pCurrentAcount->calculateBudgetLeft());
+    QString updatedCurrentIncome = "$" + QString::number(pCurrentAcount->getIncome());
+    ui->updateCurrentIncomeLeftLabel->setText(updatedCurrentIncome);
+
+    QString updatedCurrentSavings = "$" + QString::number(pCurrentAcount->getSavings());
+    ui->updateCurrentSavingsLabel->setText(updatedCurrentSavings);
+
+    spendingsBarSet->replace(0, pCurrentAcount->getTotalFromType(qExpenses));
+    budgetLeftBarSet->replace(0, pCurrentAcount->calculateBudgetLeft(qExpenses));
+
+   /* QString spendingLabel = "$" + spendingsBarSet->label();
+    QString budgetLeftLabel = "$" + budgetLeftBarSet->label()*/;
+    //spendingLabel += QString::number(pCurrentAcount->getTotalFromType(qExpenses));
+    //budgetLeftLabel += QString::number(pCurrentAcount->calculateBudgetLeft(qExpenses));
+
+    QString spendingLabel = "Spendings, $" + QString::number(pCurrentAcount->getTotalFromType(qExpenses));
+    QString budgetLeftLabel = "Budget Left, $" + QString::number(pCurrentAcount->calculateBudgetLeft(qExpenses));
     spendingsBarSet->setLabel(spendingLabel);
     budgetLeftBarSet->setLabel(budgetLeftLabel);
 
@@ -165,34 +186,95 @@ void mainDashboard::updateUi(Account* ref)
 
     spendSeries->clear();
     catSeries->clear();
-    QStringList categories;
-    QStringList transactions;
 
-    for(int i = 0; i < pCurrentAcount->getNumCategories(); i++)
+    spendingsBreakDownChart *spendingsBreakdown = new spendingsBreakDownChart();
+    spendingsBreakdown->setTheme(QChart::ChartThemeLight);
+    spendingsBreakdown->setAnimationOptions(QChart::AllAnimations);
+    spendingsBreakdown->legend()->setVisible(true);
+    spendingsBreakdown->legend()->setAlignment(Qt::AlignRight);
+
+    QStringList categories = pCurrentAcount->getSpendingCategories();
+//    QStringList transactions = pCurrentAcount->getSpendingTransactions();
+
+
+    spendSeries= new QtCharts::QPieSeries();
+    spendSeries->setName("Spendings Breakdown");
+
+    for(QString category : categories)
     {
-        QString pCategoryTitle= pCurrentAcount->getCategoryTitle(i);
-        categories << pCategoryTitle;
-        int pCategoryTotal = pCurrentAcount->getTotalFromOneCategory(i);
-        spendSeries->append(new spendingsBreakdownSlice(pCategoryTotal, pCategoryTitle, catSeries));
-        //for(int i = 0; i < pCurrentAcount)
+        catSeries = new QPieSeries();
+        catSeries->setName("Spendings - " + category);
+        // You now have a category name
+        QList<Transaction> transactions = pCurrentAcount->getSpendingTransactions(category);
+        // You now have all the transactions for that specific category
+        // You need to have a loop here that goes through the transactions and does something
+        // ...
+        for(Transaction trans : transactions)
+            catSeries->append(new spendingsBreakdownSlice(trans.getTransactionAmount(),trans.getTransactionName(),spendSeries));
+
+        QObject::connect(catSeries, &QPieSeries::clicked, spendingsBreakdown, &spendingsBreakDownChart::handleSliceClicked);
+
+        spendSeries->append(new spendingsBreakdownSlice((pCurrentAcount->getTotalFromOneCategory(category, qExpenses)), category, catSeries));
     }
+
+    QObject::connect(spendSeries, &QPieSeries::clicked, spendingsBreakdown, &spendingsBreakDownChart::handleSliceClicked);
+    spendingsBreakdown->changeSeries(spendSeries);
+
+     QChartView *spendBreakdownChartView = new QChartView(spendingsBreakdown);
+    spendBreakdownChartView->setRenderHint(QPainter::Antialiasing);
+    spendBreakdownChartView->setParent(this);
+    spendBreakdownChartView->setGeometry(ui->spendingChartPlaceholder->geometry());
+    spendBreakdownChartView->showNormal();
+
+
+//    for (const QString &name : names) {
+//        QPieSeries *series = new QPieSeries(&window);
+//        series->setName("Sales by month - " + name);
+
+//        for (const QString &month : months)
+//            *series << new DrilldownSlice(QRandomGenerator::global()->bounded(1000), month, yearSeries);
+
+//        QObject::connect(series, &QPieSeries::clicked, chart, &DrilldownChart::handleSliceClicked);
+
+//        *yearSeries << new DrilldownSlice(series->sum(), name, series);
+//    }
+
+//    QObject::connect(yearSeries, &QPieSeries::clicked, chart, &DrilldownChart::handleSliceClicked);
+
+//    chart->changeSeries(yearSeries);
+
+//    QChartView *chartView = new QChartView(chart);
+
+    }
+
+    //for(int i = 0; i < pCurrentAcount->get)
+    //spendingsBreakDownChart *spendingsBreakdown = new spendingsBreakDownChart();
+
+//    for(int i = 0; i < pCurrentAcount->get(); i++)
+//    {
+//        QString pCategoryTitle= pCurrentAcount->getCategoryTitle(i);
+//        categories << pCategoryTitle;
+//        int pCategoryTotal = pCurrentAcount->getTotalFromOneCategory(i);
+//        spendSeries->append(new spendingsBreakdownSlice(pCategoryTotal, pCategoryTitle, catSeries));
+//        //for(int i = 0; i < pCurrentAcount)
+//    }
 
     //in progress
 
-//    for (const QString &category : categories) {
+//    for (QString &category : categories) {
 //        catSeries = new QPieSeries();
 //        catSeries->setName("Spendings - " + category);
 
-//        for (const QString &transaction : transactions)
-//            catSeries->append(new spendingsBreakdownSlice(QRandomGenerator::global()->bounded(1000), transaction, spendSeries));
+//        for (QString &transaction : transactions)
+//            for(int i = 0; i < pCurrentAcount->getTotaNumberOfTransactions(qExpenses); i++)
+//            catSeries->append(new spendingsBreakdownSlice(pCurrentAcount->getTotalFromTransaction(i, qExpenses), transaction, spendSeries));
 
 //        QObject::connect(catSeries, &QPieSeries::clicked, spendingsBreakdown, &spendingsBreakDownChart::handleSliceClicked);
 
-//        spendSeries->append(new spendingsBreakdownSlice(catSeries->sum(), category, catSeries));
+//        spendSeries->append(new spendingsBreakdownSlice(pCurrentAcount->getTotalFromOneCategory(category, qExpenses), category, catSeries));
 //    }
 
 //    QObject::connect(spendSeries, &QPieSeries::clicked, spendingsBreakdown, &spendingsBreakDownChart::handleSliceClicked);
-
 //    spendingsBreakdown->changeSeries(spendSeries);
 
     //    for (const QString &category : categories) {
@@ -207,33 +289,51 @@ void mainDashboard::updateUi(Account* ref)
     //        spendSeries->append(new spendingsBreakdownSlice(13, category, catSeries));
     //    }
 
-}
+
 
 
 
 void mainDashboard::on_spendingsButton_clicked()
 {
+    flag = 0;
     spendingsTable.show();
-    spendingsTable.setWindowTitle("Spendings");
+    spendingsTable.setWindowTitle("Expenses");
 
     //Account* currentAccount = new Account;
     //currentAccount = currentAccount->thisAcc();
 
-    DatabaseReaderWriter *db = DatabaseReaderWriter::Instance();
-    Account *currentAccount = db->getAccountInstance();
+    //DatabaseReaderWriter *db = DatabaseReaderWriter::Instance();
+    //Account *currentAccount = db->getAccountInstance();
     //If there are transactions in the vector & no data in the
     //table, the ui will be updated.
 
-    if(spendingsTable.getRowCount() == 0 /*&& currentAccount->getExpenditureSize() != 0*/)
-    {spendingsTable.updateUi();}
+    if(spendingsTable.getRowCount() == 0)
+    {spendingsTable.updateUi(spendingsTable.windowTitle());}
 
-    if(currentAccount->getExpenditureSize() == 0)
-    {spendingsTable.setWindowTitle("0 in Vector");}
+    //if(currentAccount->getExpenditureSize() == 0)
+    //{spendingsTable.setWindowTitle("0 in Vector");}
 }
 
 
 void mainDashboard::on_incomeButton_clicked()
 {
+    flag = 1;
     incomeTable.show();
     incomeTable.setWindowTitle("Income");
+
+    if(incomeTable.getRowCount() == 0)
+    {incomeTable.updateUi(incomeTable.windowTitle());}
+}
+
+int mainDashboard::getFlag()
+{
+    return flag;
+}
+
+void mainDashboard::on_updateBudgetButton_clicked()
+{
+    updateBudgetWindow.show();
+    updateBudgetWindow.setWindowTitle("");
+
+
 }

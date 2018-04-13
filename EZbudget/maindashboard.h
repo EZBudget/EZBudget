@@ -6,6 +6,7 @@
 #include <QtCharts/QBarSet>
 #include <QtCharts/QPieSeries>
 #include "tablewidget.h"
+#include "updatebudgetdialog.h"
 //class QPieSeries;
 //class QBarSet;
 
@@ -21,15 +22,19 @@ class mainDashboard : public QMainWindow
 
 public:
     explicit mainDashboard(QWidget *parent = 0);
-    ~mainDashboard(); 
+    ~mainDashboard();
+    int getFlag();
 
 public slots:
-    void updateUi(Account *ref);
+    void updateUi();
 
 private slots:
     void on_spendingsButton_clicked();
 
     void on_incomeButton_clicked();
+
+
+    void on_updateBudgetButton_clicked();
 
 private:
     Ui::mainDashboard *ui;
@@ -43,7 +48,8 @@ private:
     //QtCharts::QBarSet *m_set2;
     tableWidget spendingsTable;
     tableWidget incomeTable;
-
+    int flag;
+    updateBudgetDialog updateBudgetWindow;
 };
 
 #endif // MAINDASHBOARD_H

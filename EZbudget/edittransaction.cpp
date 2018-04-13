@@ -1,6 +1,8 @@
 #include "edittransaction.h"
 #include "ui_edittransaction.h"
 #include "account.h"
+#include "databasereaderwriter.h"
+#include "maindashboard.h"
 #include <QPushButton>
 
 editTransaction::editTransaction(QWidget *parent) :
@@ -38,16 +40,16 @@ double editTransaction::transactionAmount() const
 }
 
 
-/*QString editTransaction::transactionType() const
-{
-    return ui->transactionTypeEdit->currentText();
-}*/
+//QString editTransaction::transactionType() const
+//{
+//    return ui->transactionTypeEdit->currentText();
+//}
 
 
 void editTransaction::on_buttonBox_accepted()
 {
     accept();
-   //saveChangestoExpenditures(transactionCategory(), transactionName(), transactionDate(), transactionAmount(), );
+   // saveChangestoExpenditures(transactionCategory(), transactionName(), transactionDate(), transactionAmount());
 }
 
 void editTransaction::on_buttonBox_rejected()
@@ -55,10 +57,11 @@ void editTransaction::on_buttonBox_rejected()
     reject();
 }
 
-void editTransaction::saveChangestoExpenditures(QString transacCategory, QString transacName, QString transacDate, float amount, int row)
+/*void editTransaction::saveChangestoExpenditures(QString transacCategory, QString transacName, QString transacDate, float amount, int row)
 {
-    Account* currentAccount = new Account;
-    //currentAccount->thisAcc();
+    DatabaseReaderWriter *db;
+    Account* currentAccount = db -> getAccountInstance();
 
-    currentAccount->saveFromSpendings(transacCategory, transacName, transacDate, amount, row);
-}
+
+    currentAccount->editTransactions(transacCategory, transacName, transacDate, transactionType, amount, row);
+}*/
