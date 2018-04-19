@@ -27,11 +27,11 @@ class Ui_login
 public:
     QWidget *centralWidget;
     QLabel *label;
-    QLabel *label_2;
-    QLabel *label_3;
+    QPushButton *pushButton;
     QLineEdit *lineEdit_username;
     QLineEdit *lineEdit_password;
-    QPushButton *pushButton;
+    QLabel *label_3;
+    QLabel *label_2;
     QMenuBar *menuBar;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
@@ -41,7 +41,7 @@ public:
     {
         if (login->objectName().isEmpty())
             login->setObjectName(QStringLiteral("login"));
-        login->resize(365, 271);
+        login->resize(626, 501);
         centralWidget = new QWidget(login);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         label = new QLabel(centralWidget);
@@ -52,20 +52,14 @@ public:
         font.setBold(true);
         font.setWeight(75);
         label->setFont(font);
-        label_2 = new QLabel(centralWidget);
-        label_2->setObjectName(QStringLiteral("label_2"));
-        label_2->setGeometry(QRect(30, 60, 81, 20));
+        pushButton = new QPushButton(centralWidget);
+        pushButton->setObjectName(QStringLiteral("pushButton"));
+        pushButton->setGeometry(QRect(170, 150, 75, 23));
         QFont font1;
-        font1.setFamily(QStringLiteral("Segoe Script"));
-        font1.setPointSize(10);
-        label_2->setFont(font1);
-        label_3 = new QLabel(centralWidget);
-        label_3->setObjectName(QStringLiteral("label_3"));
-        label_3->setGeometry(QRect(30, 110, 67, 23));
-        QFont font2;
-        font2.setFamily(QStringLiteral("Segoe Print"));
-        font2.setPointSize(10);
-        label_3->setFont(font2);
+        font1.setPointSize(9);
+        font1.setBold(true);
+        font1.setWeight(75);
+        pushButton->setFont(font1);
         lineEdit_username = new QLineEdit(centralWidget);
         lineEdit_username->setObjectName(QStringLiteral("lineEdit_username"));
         lineEdit_username->setGeometry(QRect(130, 60, 141, 20));
@@ -73,18 +67,24 @@ public:
         lineEdit_password->setObjectName(QStringLiteral("lineEdit_password"));
         lineEdit_password->setGeometry(QRect(130, 110, 141, 20));
         lineEdit_password->setEchoMode(QLineEdit::Password);
-        pushButton = new QPushButton(centralWidget);
-        pushButton->setObjectName(QStringLiteral("pushButton"));
-        pushButton->setGeometry(QRect(170, 150, 75, 23));
+        label_3 = new QLabel(centralWidget);
+        label_3->setObjectName(QStringLiteral("label_3"));
+        label_3->setGeometry(QRect(30, 110, 67, 23));
+        QFont font2;
+        font2.setFamily(QStringLiteral("Segoe Print"));
+        font2.setPointSize(10);
+        label_3->setFont(font2);
+        label_2 = new QLabel(centralWidget);
+        label_2->setObjectName(QStringLiteral("label_2"));
+        label_2->setGeometry(QRect(30, 60, 81, 20));
         QFont font3;
-        font3.setPointSize(9);
-        font3.setBold(true);
-        font3.setWeight(75);
-        pushButton->setFont(font3);
+        font3.setFamily(QStringLiteral("Segoe Script"));
+        font3.setPointSize(10);
+        label_2->setFont(font3);
         login->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(login);
         menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 365, 21));
+        menuBar->setGeometry(QRect(0, 0, 626, 17));
         login->setMenuBar(menuBar);
         mainToolBar = new QToolBar(login);
         mainToolBar->setObjectName(QStringLiteral("mainToolBar"));
@@ -105,9 +105,9 @@ public:
     {
         login->setWindowTitle(QApplication::translate("login", "login", nullptr));
         label->setText(QApplication::translate("login", "[+]Status", nullptr));
-        label_2->setText(QApplication::translate("login", "Username:", nullptr));
-        label_3->setText(QApplication::translate("login", "Password:", nullptr));
         pushButton->setText(QApplication::translate("login", "Login", nullptr));
+        label_3->setText(QApplication::translate("login", "Password:", nullptr));
+        label_2->setText(QApplication::translate("login", "Username:", nullptr));
         toolBar->setWindowTitle(QApplication::translate("login", "toolBar", nullptr));
     } // retranslateUi
 

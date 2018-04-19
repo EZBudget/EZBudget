@@ -20,6 +20,7 @@ login::login(QWidget *parent) :
         ui->label->setText("Failed to open database");
     else
         ui->label->setText("Connected");
+
 }
 
 login::~login()

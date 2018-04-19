@@ -4,14 +4,16 @@
 #include <iostream>
 #include "account.h"
 #include "login.h"
-
+#include "loginwithlogo.h"
 using namespace std;
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     a.setStyle("fusion");
-    login l;
+    //login l;
+    //l.show();
+    loginWithLogo l;
     l.show();
     //loginScreen l;
     //l.show();
