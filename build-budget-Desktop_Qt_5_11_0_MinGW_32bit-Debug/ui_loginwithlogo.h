@@ -127,6 +127,9 @@ public:
 
         pushButton = new QPushButton(widget);
         pushButton->setObjectName(QStringLiteral("pushButton"));
+        QFont font2;
+        font2.setFamily(QStringLiteral("MS Shell Dlg 2"));
+        pushButton->setFont(font2);
 
         horizontalLayout_2->addWidget(pushButton);
 
@@ -162,11 +165,11 @@ public:
         status_label = new QLabel(widget);
         status_label->setObjectName(QStringLiteral("status_label"));
         status_label->setEnabled(true);
-        QFont font2;
-        font2.setPointSize(12);
-        font2.setBold(true);
-        font2.setWeight(75);
-        status_label->setFont(font2);
+        QFont font3;
+        font3.setPointSize(12);
+        font3.setBold(true);
+        font3.setWeight(75);
+        status_label->setFont(font3);
 
         verticalLayout_4->addWidget(status_label);
 

@@ -30,13 +30,13 @@
      <string/>
     </property>
     <property name="pixmap">
-     <pixmap>../../../../Pictures/Saved Pictures/comboLogo2.png</pixmap>
+     <pixmap>../../../../OneDrive/Desktop/comboLogo2.png</pixmap>
     </property>
     <property name="scaledContents">
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>110</x>
