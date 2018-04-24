@@ -56,12 +56,3 @@ void editTransaction::on_buttonBox_rejected()
 {
     reject();
 }
-
-/*void editTransaction::saveChangestoExpenditures(QString transacCategory, QString transacName, QString transacDate, float amount, int row)
-{
-    DatabaseReaderWriter *db;
-    Account* currentAccount = db -> getAccountInstance();
-
-
-    currentAccount->editTransactions(transacCategory, transacName, transacDate, transactionType, amount, row);
-}*/

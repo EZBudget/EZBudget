@@ -34,6 +34,7 @@ public:
     void addTransaction(QString category, QString name, QString date, QString type, int amount);
     void removeTransaction(int rowIndex, QString type);
     void editTransaction(QString category, QString name, QString date, QString type, int amount, int index);
+    void updateProfile(int income, int budget, int savings);
 
     Account* getAccountInstance();
 private:

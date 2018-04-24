@@ -337,5 +337,4 @@ void mainDashboard::on_updateBudgetButton_clicked()
     updateBudgetWindow.show();
     updateBudgetWindow.setWindowTitle("");
 
-
 }
